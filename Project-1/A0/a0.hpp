@@ -91,7 +91,7 @@ int get_sub_matrix(int n, int m, int start_n, int start_m, const std::vector<flo
 void filter_2d(int n, int m, const std::vector<float>& K, std::vector<float>& A) {
     // std::cout << "No. of rows: " << n << std::endl << "No. of columns: " << m << std::endl;
     // int total_matrices = 0;
-    unsigned int i = 0;
+    unsigned long i = 0;
     // unsigned long j = 0;
     // unsigned long k = 0;
     // int sum = 0;
@@ -100,7 +100,7 @@ void filter_2d(int n, int m, const std::vector<float>& K, std::vector<float>& A)
     #pragma omp parallel default(none) shared(n,m,K,A,A1) private(i)
     {
         // #pragma omp single
-        #pragma omp taskloop
+        #pragma omp for
         for(i = 0; i < ( (n * m) - ((2*m) - 2)); i++)
         {
             // #pragma omp task shared(A1) untied
