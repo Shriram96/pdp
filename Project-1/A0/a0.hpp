@@ -100,6 +100,7 @@ void filter_2d(int n, int m, const std::vector<float>& K, std::vector<float>& A)
     #pragma omp parallel default(none) shared(n,m,K,A,A1) private(i)
     {
         // #pragma omp single
+        // #pragma omp taskloop default(none) shared(n,m,K,A,A1) private(i)
         #pragma omp for
         for(i = 0; i < ( (n * m) - ((2*m) - 2)); i++)
         {
