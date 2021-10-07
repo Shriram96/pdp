@@ -33,12 +33,26 @@ void get_sub_matrix1(int n, int m, int start_n, int start_m, const std::vector<f
         }
         columnsum += rowsum;
     }
-    std::cout << "Sum: " << columnsum << "\t" << "At: " << start_n + 1 << "x" << start_m + 1;
+    std::cout << "3)Sum: " << columnsum << "\t" << "At: " << start_n + 1 << "x" << start_m + 1 << std::endl;
 }
 
 int get_sub_matrix(int n, int m, int start_n, int start_m, const std::vector<float>& K, std::vector<float>& A)
 {
     int sum = 0;
+    // for(unsigned int k = 0; k <= 2; k++)
+    // {
+    //     sum += (A[((start_n + k) * n) + start_m] * K[0] \
+    //                                 + A[((start_n + k) * n) + (start_m + 1)] * K[3] \
+    //                                 + A[((start_n + k) * n) + (start_m + 2)] * K[6]);
+    //     sum += (A[((start_n + k) * n) + start_m] * K[1] \
+    //                                 + A[((start_n + k) * n) + (start_m + 1)] * K[4] \
+    //                                 + A[((start_n + k) * n) + (start_m + 2)] * K[7]);
+    //     sum += (A[((start_n + k) * n) + start_m] * K[2] \
+    //                                 + A[((start_n + k) * n) + (start_m + 1)] * K[5] \
+    //                                 + A[((start_n + k) * n) + (start_m + 2)] * K[8]);
+    // }
+    // std::cout << "1)Sum: " << sum << "\t" << "At: " << start_n + 1 << "x" << start_m + 1 << std::endl;
+    sum = 0;
     sum += (A.at((start_n * n) + start_m) * K.at(0) \
         + A.at((start_n * n) + (start_m + 1)) * K.at(3) \
         + A.at((start_n * n) + (start_m + 2)) * K.at(6));
@@ -69,7 +83,7 @@ int get_sub_matrix(int n, int m, int start_n, int start_m, const std::vector<flo
         + A.at(((start_n + 2) * n) + (start_m + 1)) * K.at(5) \
         + A.at(((start_n + 2) * n) + (start_m + 2)) * K.at(8));
 
-    // std::cout << "Sum: " << sum << "\t" << "At: " << start_n + 1 << "x" << start_m + 1;
+    // std::cout << "2)Sum: " << sum << "\t" << "At: " << start_n + 1 << "x" << start_m + 1 << std::endl;
     return sum;
 }
 
@@ -78,55 +92,55 @@ void filter_2d(int n, int m, const std::vector<float>& K, std::vector<float>& A)
     // std::cout << "No. of rows: " << n << std::endl << "No. of columns: " << m << std::endl;
     // int total_matrices = 0;
     unsigned int i = 0;
-    unsigned int j = 0;
-    unsigned int k = 0;
-    int sum = 0;
-    std::vector<float> A1(n * m);
-    std::cout << omp_get_max_threads() << std::endl;
-    #pragma omp parallel for shared(K,A,A1,std::cout) private(i,j,k,sum) collapse(2) schedule(dynamic)
-        for(i = 0; i <= n-3; i++)
+    // unsigned long j = 0;
+    // unsigned long k = 0;
+    // int sum = 0;
+    std::vector<float> A1(n * m, 0.0);
+    // std::cout << omp_get_max_threads() << std::endl;
+    #pragma omp parallel default(none) shared(n,m,K,A,A1) private(i)
+    {
+        // #pragma omp single
+        #pragma omp taskloop
+        for(i = 0; i < ( (n * m) - ((2*m) - 2)); i++)
         {
-            for(j = 0; j <= m-3; j++)
-            {
-                // std::cout << ++total_matrices << ")" << std::endl;
-                // A1[(i * n) + j] = get_sub_matrix(n, m, i, j, K, A);
-                // get_sub_matrix1(n, m, i, j, K, A);
-                // std::cout << std::endl << std::endl << std::endl;
-                sum += (A.at((i * n) + j) * K.at(0) \
-                    + A.at((i * n) + (j + 1)) * K.at(3) \
-                    + A.at((i * n) + (j + 2)) * K.at(6));
-                sum += (A.at((i * n) + j) * K.at(1) \
-                    + A.at((i * n) + (j + 1)) * K.at(4) \
-                    + A.at((i * n) + (j + 2)) * K.at(7));
-                sum += (A.at((i * n) + j) * K.at(2) \
-                    + A.at((i * n) + (j + 1)) * K.at(5) \
-                    + A.at((i * n) + (j + 2)) * K.at(8));
+            // #pragma omp task shared(A1) untied
+            A1[i + m + 1] += (A[i] * K[0] \
+                            + A[i + 1] * K[3] \
+                            + A[i + 2] * K[6]);
+            A1[i + m + 1] += (A[i] * K[1] \
+                            + A[i + 1] * K[4] \
+                            + A[i + 2] * K[7]);
+            A1[i + m + 1] += (A[i] * K[2] \
+                            + A[i + 1] * K[5] \
+                            + A[i + 2] * K[8]);
 
-                sum += (A.at(((i + 1) * n) + j) * K.at(0) \
-                    + A.at(((i + 1) * n) + (j + 1)) * K.at(3) \
-                    + A.at(((i + 1) * n) + (j + 2)) * K.at(6));
-                sum += (A.at(((i + 1) * n) + j) * K.at(1) \
-                    + A.at(((i + 1) * n) + (j + 1)) * K.at(4) \
-                    + A.at(((i + 1) * n) + (j + 2)) * K.at(7));
-                sum += (A.at(((i + 1) * n) + j) * K.at(2) \
-                    + A.at(((i + 1) * n) + (j + 1)) * K.at(5) \
-                    + A.at(((i + 1) * n) + (j + 2)) * K.at(8));
+            // #pragma omp task shared(A1) untied
+            A1[i + m + 1] += (A[i+m] * K[0] \
+                            + A[i + m + 1] * K[3] \
+                            + A[i + m + 2] * K[6]);
+            A1[i + m + 1] += (A[i+m] * K[1] \
+                            + A[i + m + 1] * K[4] \
+                            + A[i + m + 2] * K[7]);
+            A1[i + m + 1] += (A[i+m] * K[2] \
+                            + A[i + m + 1] * K[5] \
+                            + A[i + m + 2] * K[8]);
 
-                sum += (A.at(((i + 2) * n) + j) * K.at(0) \
-                    + A.at(((i + 2) * n) + (j + 1)) * K.at(3) \
-                    + A.at(((i + 2) * n) + (j + 2)) * K.at(6));
-                sum += (A.at(((i + 2) * n) + j) * K.at(1) \
-                    + A.at(((i + 2) * n) + (j + 1)) * K.at(4) \
-                    + A.at(((i + 2) * n) + (j + 2)) * K.at(7));
-                sum += (A.at(((i + 2) * n) + j) * K.at(2) \
-                    + A.at(((i + 2) * n) + (j + 1)) * K.at(5) \
-                    + A.at(((i + 2) * n) + (j + 2)) * K.at(8));
-                A1[((i + 1) * n) + (j + 1)] = sum;
-                // std::cout << omp_get_thread_num() << std::endl;
-                #pragma omp critical
-                std::cout << i+1 << 'x' << j+1 << " Thread:" << omp_get_thread_num() << std::endl;
-            }
+            // #pragma omp task shared(A1) untied
+            A1[i + m + 1] += (A[i + (2 * m)] * K[0] \
+                            + A[i + (2 * m) + 1] * K[3] \
+                            + A[i + (2 * m) + 2] * K[6]);
+            A1[i + m + 1] += (A[i + (2 * m)] * K[1] \
+                            + A[i + (2 * m) + 1] * K[4] \
+                            + A[i + (2 * m) + 2] * K[7]);
+            A1[i + m + 1] += (A[i + (2 * m)] * K[2] \
+                            + A[i + (2 * m) + 1] * K[5] \
+                            + A[i + (2 * m) + 2] * K[8]);
+            // A1[((i + 1) * n) + (j + 1)] = sum;
+            // std::cout << omp_get_thread_num() << std::endl;
+            // #pragma omp critical
+            // std::cout << i + 1 << 'x' << j+1 << " Thread:" << omp_get_thread_num() << std::endl;
         }
+    }
     A = A1;
 } // filter_2d
 

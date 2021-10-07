@@ -12,7 +12,7 @@
 #SBATCH --job-name="changeme"
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=32
-#SBATCH --time=01:00:00
+#SBATCH --time=02:00:00
 
 # your app invocation should follow
 # ...
@@ -58,15 +58,13 @@ for i in "${volumes[@]}"
 do
 	for j in "${threads[@]}"
    do
-      echo "\n############################################################\n"
       echo "Threads = $j"
       echo "Rows = $i"
       echo "Columns = $i"
+      echo "\n############################################################\n"
       for (( k = 0; k < 20; k++ ))
       do
-         echo "\n####################\n"
          OMP_NUM_THREADS="$j" ./a0 "$i" "$i"
-         echo "\n####################\n"
       done
       echo "\n############################################################\n"
    done
