@@ -4,7 +4,7 @@
 #SBATCH --clusters=ub-hpc
 #SBATCH --qos=general-compute
 #SBATCH --exclusive
-#SBATCH --mem=23000
+#SBATCH --mem=64000
 #SBATCH --output=%j.stdout
 #SBATCH --error=%j.stderr
 
