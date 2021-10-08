@@ -92,16 +92,17 @@ void filter_2d(int n, int m, const std::vector<float>& K, std::vector<float>& A)
     // std::cout << "No. of rows: " << n << std::endl << "No. of columns: " << m << std::endl;
     // int total_matrices = 0;
     unsigned long i = 0;
+    // std::cout << sizeof(float) << std::endl;
     // unsigned long j = 0;
     // unsigned long k = 0;
     // int sum = 0;
     std::vector<float> A1(n * m, 0.0);
     // std::cout << omp_get_max_threads() << std::endl;
-    #pragma omp parallel default(none) shared(n,m,K,A,A1) private(i)
-    {
+    #pragma omp parallel for default(none) shared(n,m,K,A,A1) private(i)
+    // {
         // #pragma omp single
         // #pragma omp taskloop default(none) shared(n,m,K,A,A1) private(i)
-        #pragma omp for
+        // #pragma omp for
         for(i = 0; i < ( (n * m) - ((2*m) - 2)); i++)
         {
             // #pragma omp task shared(A1) untied
@@ -116,13 +117,13 @@ void filter_2d(int n, int m, const std::vector<float>& K, std::vector<float>& A)
                             + A[i + 2] * K[8]);
 
             // #pragma omp task shared(A1) untied
-            A1[i + m + 1] += (A[i+m] * K[0] \
+            A1[i + m + 1] += (A[i + m] * K[0] \
                             + A[i + m + 1] * K[3] \
                             + A[i + m + 2] * K[6]);
-            A1[i + m + 1] += (A[i+m] * K[1] \
+            A1[i + m + 1] += (A[i + m] * K[1] \
                             + A[i + m + 1] * K[4] \
                             + A[i + m + 2] * K[7]);
-            A1[i + m + 1] += (A[i+m] * K[2] \
+            A1[i + m + 1] += (A[i + m] * K[2] \
                             + A[i + m + 1] * K[5] \
                             + A[i + m + 2] * K[8]);
 
@@ -141,7 +142,7 @@ void filter_2d(int n, int m, const std::vector<float>& K, std::vector<float>& A)
             // #pragma omp critical
             // std::cout << i + 1 << 'x' << j+1 << " Thread:" << omp_get_thread_num() << std::endl;
         }
-    }
+    // }
     A = A1;
 } // filter_2d
 
