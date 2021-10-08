@@ -51,7 +51,7 @@
 
 module load gcc/10.2.0
 cd "/user/shriramr/pdp/Project-1/A0"
-make clean all
+# make clean all
 threads=( 1 2 4 8 16 32 64 128 )
 volumes=( 100 500 1000 5000 10000 )
 for i in "${volumes[@]}"
