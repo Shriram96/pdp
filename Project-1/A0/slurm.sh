@@ -11,14 +11,13 @@
 #SBATCH --error=%j.stderr
 
 ####### CUSTOMIZE THIS SECTION FOR YOUR JOB
-#SBATCH --job-name="changeme"
+#SBATCH --job-name="shriramr-a0"
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=20
-#SBATCH --time=01:30:00
+#SBATCH --time=02:00:00
 
-module load gcc/10.2.0
-cd "/user/shriramr/pdp/Project-1/A0"
-make clean all
+# module load gcc
+# make clean all
 threads=( 1 2 4 6 8 10 )
 volumes=( 1000 2000 4000 6000 8000 10000 )
 tests=3
