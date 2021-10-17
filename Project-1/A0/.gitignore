@@ -1,4 +1,4 @@
 /Backup
 *.stdout
 *.stderr
-a0
+a0*

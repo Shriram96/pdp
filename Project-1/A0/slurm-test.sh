@@ -19,7 +19,6 @@ cd "/user/shriramr/pdp/Project-1/A0"
 make clean all
 threads=( 1 2 4 6 8 10 )
 volumes=( 1000 2000 4000 6000 8000 10000 )
-tests=1
 for i in "${volumes[@]}"
 do
 	for j in "${threads[@]}"
@@ -28,13 +27,10 @@ do
       echo "Rows = 100000"
       echo "Columns = $i"
       echo "START:############################################################"
-      for (( k = 0; k < "$tests"; k++ ))
+      for (( k = 0; k < 3; k++ ))
       do
-         OMP_NUM_THREADS="$j" ./a0 100000 "$i"
-      done
-      for (( k = 0; k < "$tests"; k++ ))
-      do
-         OMP_NUM_THREADS="$j" ./a0 "$i" 100000
+         OMP_NUM_THREADS="$j" ./a01 100000 "$i"
+         OMP_NUM_THREADS="$j" ./a01 "$i" 100000
       done
       echo "END:############################################################"
    done

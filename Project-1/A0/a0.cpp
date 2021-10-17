@@ -14,10 +14,10 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    int n = std::atoi(argv[1]);
-    int m = std::atof(argv[2]);
+    unsigned long int n = std::atoi(argv[1]);
+    unsigned long int m = std::atof(argv[2]);
 
-    if (n * m < 32) {
+    if (n * m < 9) {
         std::cout << "hey, A is too small even for debugging!" << std::endl;
         return -1;
     }
@@ -33,10 +33,44 @@ int main(int argc, char* argv[]) {
     std::generate(std::begin(A), std::end(A), std::bind(N, gen));
     std::generate(std::begin(K), std::end(K), std::bind(N, gen));
 
+    // std::cout << std::endl;
+    // for(int i = 0; i < 3; i++)
+    // {
+    //     for(int j = 0; j < 3; j++)
+    //     {
+    //        std::cout << K[(i * 3) + j] << "\t\t\t";
+    //     }
+    //     std::cout << std::endl;
+    // }
+
+    // std::cout << "K" << std::endl;
+    // for(int i = 0; i < K.size(); i++)
+    // {
+    //     std::cout << K[i] << "\t";
+    // }
+    // std::cout << std::endl << std::endl << std::endl;
+
+    // for(int i = 0; i < n; i++)
+    // {
+    //     for(int j = 0; j < m; j++)
+    //     {
+    //        std::cout << A[(i * m) + j] << "\t\t\t";
+    //     }
+    //     std::cout << std::endl;
+    // }
+
+    // std::cout << "A" << std::endl;
+    // for(int i = 0; i < A.size(); i++)
+    // {
+    //     std::cout << A[i] << "\t";
+    // }
+    // std::cout << std::endl << std::endl << std::endl;
+
     // now running your awesome code from a0.hpp
     auto t0 = std::chrono::system_clock::now();
 
-    filter_2d(n, m, K, A);
+    // filter_2d2(n, m, K, A);
+    filter_2d3(n, m, K, A);
 
     auto t1 = std::chrono::system_clock::now();
 
