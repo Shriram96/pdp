@@ -1,12 +1,13 @@
-/*  YOUR_FIRST_NAME
- *  YOUR_LAST_NAME
- *  YOUR_UBIT_NAME
+/*  SHRIRAM
+ *  RAVI
+ *  shriramr
  */
 
 #ifndef A0_HPP
 #define A0_HPP
-#include <omp.h>
+
 #include <vector>
+
 
 void filter_2d(int n, int m, const std::vector<float>& K, std::vector<float>& A) {
     unsigned int i = 0;
@@ -64,6 +65,7 @@ void filter_2d(int n, int m, const std::vector<float>& K, std::vector<float>& A)
     // }
 
     A = A1;
+
 } // filter_2d
 
 #endif // A0_HPP
