@@ -103,8 +103,10 @@ void filter_2d(int n, int m, const std::vector<float>& K, std::vector<float>& A)
         // #pragma omp single
         // #pragma omp taskloop default(none) shared(n,m,K,A,A1) private(i)
         // #pragma omp for
-        for(i = 0; i < ( (n * m) - ((2*m) - 2)); i++)
+        for(i = 0; i < (m * (n - 2)); i++)
         {
+            if((i % m) > 2)
+                continue;
             // #pragma omp task shared(A1) untied
             A1[i + m + 1] += (A[i] * K[0] \
                             + A[i + 1] * K[3] \
