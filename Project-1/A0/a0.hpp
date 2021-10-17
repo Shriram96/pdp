@@ -8,7 +8,7 @@
 #include <omp.h>
 #include <vector>
 
-void filter_2d3(int n, int m, const std::vector<float>& K, std::vector<float>& A) {
+void filter_2d(int n, int m, const std::vector<float>& K, std::vector<float>& A) {
     unsigned int i = 0;
     unsigned int j = 0;
     float sum = 0.0;
@@ -24,13 +24,13 @@ void filter_2d3(int n, int m, const std::vector<float>& K, std::vector<float>& A
 
     #pragma omp parallel default(none) shared(A1, n, m, A, KRowSum) private(i, j)
     {
-        // #pragma omp single
-        #pragma omp for schedule(guided)
+        #pragma omp single
+        // #pragma omp for schedule(guided)
         // #pragma omp for collapse(2)
         for(i = 0; i < (n - 2); i++)
         {
             // #pragma omp single
-            // #pragma omp task
+            #pragma omp task
             for(j = 0; j < (m - 2); j++)
             {
                 float AColSum0 = A[(i * m) + j + 0] + A[((i + 1) * m) + j + 0] + A[((i + 2) * m) + j + 0];
