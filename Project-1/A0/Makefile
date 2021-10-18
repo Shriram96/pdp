@@ -5,6 +5,3 @@ all: a0
 
 clean:
 	rm -rf a0
-
-run: 
-	./a0 100 100

@@ -14,8 +14,8 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    int n = std::atoi(argv[1]);
-    int m = std::atof(argv[2]);
+    unsigned long int n = std::atoi(argv[1]);
+    unsigned long int m = std::atof(argv[2]);
 
     if (n * m < 32) {
         std::cout << "hey, A is too small even for debugging!" << std::endl;
