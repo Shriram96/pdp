@@ -1,0 +1,4 @@
+**/Backup*
+*.stderr
+*.stdout
+a*
