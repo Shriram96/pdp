@@ -19,4 +19,18 @@
 module load gcc
 module load intel-mpi
 # make clean all
-srun --mpi=pmi2 ./a1 100000
+
+keys=( 2 4 6 8 10 )
+base=10
+tests=3
+for i in "${keys[@]}"
+do
+    echo "Threads = 100"
+    echo "Keys = $i"
+    echo "START:############################################################"
+    for (( k = 0; k < "$tests"; k++ ))
+    do
+        srun --mpi=pmi2 ./a1 $[$base**$i]
+    done
+    echo "END:############################################################"
+done
