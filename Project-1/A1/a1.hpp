@@ -19,13 +19,10 @@ void isort(std::vector<short int>& Xi, MPI_Comm comm) {
 
     if(size == 1)
     {
-        // std::sort(Xi.begin(), Xi.end());
         return;
     }
 
     short int countersize = 2*size-1;
-    // std::vector<int> counter(countersize, 0);
-    // std::vector<int> globalcounter(countersize, 0);
     unsigned long long int counter[countersize + 1] = {0};
     unsigned long long int globalcounter[countersize + 1] = {0};
     short int keyvalues[countersize + 1] = {0};
@@ -38,7 +35,6 @@ void isort(std::vector<short int>& Xi, MPI_Comm comm) {
         counter[Xi[i] + size - 1] = counter[Xi[i] + size - 1] + 1;
     
     MPI_Barrier(comm);
-    // MPI_Allreduce(&counter, &globalcounter, countersize, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
     MPI_Reduce(&counter, &globalcounter, countersize + 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, comm);
     MPI_Barrier(comm);
 
@@ -90,44 +86,6 @@ void isort(std::vector<short int>& Xi, MPI_Comm comm) {
     fill_n(Xi.begin(), counteri[0], keyvaluesi[0]);
 
     fill_n(Xi.begin() + counteri[0], counteri[1], keyvalues[1]);
-
-    // MPI_Barrier(comm);
-    // for(int j = 0; j < size; j++)
-    // {
-        // if (rank == 0)
-        // {
-        //     std::cout << "Size: " << size << std::endl << "Rank: " << rank << std::endl << "Xi Size: " << Xi.size() << std::endl;
-        //     for(int i = 0; i < Xi.size(); i++)
-        //     {
-        //         std::cout << Xi[i] << '\t';
-        //     }
-        //     std::cout << std::endl;
-        //     std::cout << "Counts:" << std::endl;
-        //     for(int i = 0; i < countersize; i++)
-        //     {
-        //         std::cout << keyvalues[i] << ":\t" << globalcounter[i] << std::endl;
-        //     }
-        //     std::cout << std::endl;
-        //     std::cout << "Key:Counteri" << std::endl << keyvaluesi[0] << ":" << counteri[0] << std::endl << keyvaluesi[1] << ":" << counteri[1] << std::endl << std::endl;
-        // }
-        // MPI_Barrier(comm);
-        // if (rank == (size - 1))
-        // {
-        //     std::cout << "Size: " << size << std::endl << "Rank: " << rank << std::endl << "Xi Size: " << Xi.size() << std::endl;
-        //     for(int i = 0; i < Xi.size(); i++)
-        //     {
-        //         std::cout << Xi[i] << '\t';
-        //     }
-        //     std::cout << std::endl;
-        //     std::cout << "Counts:" << std::endl;
-        //     for(int i = 0; i < countersize; i++)
-        //     {
-        //         std::cout << keyvalues[i] << ":\t" << globalcounter[i] << std::endl;
-        //     }
-        //     std::cout << std::endl;
-        // }
-    //     MPI_Barrier(comm);
-    // }
 
 } // isort
 
