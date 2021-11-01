@@ -20,12 +20,12 @@ module load gcc
 module load intel-mpi
 # make clean all
 
-keys=( 2 4 6 8 10 )
+keys=( 2 3 4 5 6 7 8 9 10 )
 base=10
 tests=3
 for i in "${keys[@]}"
 do
-    echo "Threads = 100"
+    echo "Nodes = 10"
     echo "Keys = $i"
     echo "START:############################################################"
     for (( k = 0; k < "$tests"; k++ ))
