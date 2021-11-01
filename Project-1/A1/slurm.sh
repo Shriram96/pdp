@@ -22,10 +22,10 @@ module load intel-mpi
 
 keys=( 2 3 4 5 6 7 8 9 10 )
 base=10
-tests=3
+tests=5
 for i in "${keys[@]}"
 do
-    echo "Nodes = 10"
+    echo "Nodes = 40"
     echo "Keys = $i"
     echo "START:############################################################"
     for (( k = 0; k < "$tests"; k++ ))
