@@ -25,14 +25,14 @@ int main(int argc, char* argv[]) {
         return MPI_Finalize();
     }
 
-    long long int n = std::atoll(argv[1]);
+    unsigned long long int n = std::atoll(argv[1]);
 
     if (n <= size) {
         if (rank == 0) std::cout << "hey, n is too small even for debugging!" << std::endl;
         return MPI_Finalize();
     }
 
-    long long int loc_n = (n / size);
+    unsigned long long int loc_n = (n / size);
     if (rank == 0) loc_n = n - ((size -1) * loc_n);
 
     std::vector<short int> x(loc_n);
