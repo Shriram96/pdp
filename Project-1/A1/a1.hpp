@@ -31,23 +31,26 @@ void isort(std::vector<short int>& Xi, MPI_Comm comm) {
     for (int i = 0; i < Xi.size(); i++)
         counter[Xi[i] + size - 1] = counter[Xi[i] + size - 1] + 1;
     
-    Xi.clear();
-
     MPI_Barrier(comm);
     MPI_Allreduce(&counter, &globalcounter, countersize, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
     MPI_Barrier(comm);
+    // MPI_Reduce(&counter, &globalcounter, countersize, MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, comm);
 
-    for(int i = 0; i < globalcounter[rank]; i++)
+    unsigned long long int totalsize = 0;
+    totalsize += globalcounter[rank];
+    
+    if((rank + 1) <= (size - 1)) // Handles odd number of nodes case
     {
-        Xi.push_back((2*rank) - size + 1);
+        totalsize += globalcounter[rank + 1];
     }
+
+    Xi.resize(totalsize);
+
+    fill_n(Xi.begin(), globalcounter[rank], (2*rank) - size + 1);
 
     if((rank + 1) <= (size - 1)) // Handles odd number of nodes case
     {
-        for(int i = 0; i < globalcounter[rank + 1]; i++)
-        {
-            Xi.push_back((2*rank) - size + 2);
-        }
+        fill_n(Xi.begin() + globalcounter[rank], globalcounter[rank + 1], (2*rank) - size + 2);
     }
 
     MPI_Barrier(comm);
