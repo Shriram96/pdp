@@ -28,19 +28,14 @@ void isort(std::vector<short int>& Xi, MPI_Comm comm) {
     short int keyvalues[countersize + 1] = {0};
     keyvalues[countersize] = SHRT_MIN;
 
-    unsigned long long int counteri[2] = {0};
-    short int keyvaluesi[2] = {0};
-
     for (int i = 0; i < Xi.size(); i++)
         counter[Xi[i] + size - 1] = counter[Xi[i] + size - 1] + 1;
     
     MPI_Barrier(comm);
-    MPI_Reduce(&counter, &globalcounter, countersize + 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, 0, comm);
+    MPI_Allreduce(&counter, &globalcounter, countersize + 1, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
     MPI_Barrier(comm);
 
     
-    if (rank == 0)
-    {
         for(int i = 0; i < countersize; i++)
         {
             keyvalues[i] = i-size+1;
@@ -72,20 +67,34 @@ void isort(std::vector<short int>& Xi, MPI_Comm comm) {
                 }
             }
         }
-    }
 
-    MPI_Barrier(comm);
-    MPI_Scatter(&globalcounter, 2, MPI_UNSIGNED_LONG_LONG, &counteri, 2, MPI_UNSIGNED_LONG_LONG, 0, comm);
-    MPI_Scatter(&keyvalues, 2, MPI_SHORT, &keyvaluesi, 2, MPI_SHORT, 0, comm);
-    MPI_Barrier(comm);
 
-    unsigned long long int totalsize = counteri[0] + counteri[1];
+    unsigned long long int totalsize = globalcounter[rank] + globalcounter[rank + 1];
 
     Xi.resize(totalsize);
 
-    fill_n(Xi.begin(), counteri[0], keyvaluesi[0]);
+    fill_n(Xi.begin(), globalcounter[rank], (2*rank) - size + 1);
 
-    fill_n(Xi.begin() + counteri[0], counteri[1], keyvalues[1]);
+    fill_n(Xi.begin() + globalcounter[rank], globalcounter[rank + 1], (2*rank) - size + 2);
+
+    // // Place to debug
+    // MPI_Barrier(comm);
+    // if (rank == 0)
+    // {
+    //     std::cout << "Size: " << size << std::endl << "Rank: " << rank << std::endl << "Xi Size: " << Xi.size() << std::endl;
+    //     for(int i = 0; i < Xi.size(); i++)
+    //     {
+    //         std::cout << Xi[i] << '\t';
+    //     }
+    //     std::cout << std::endl;
+    //     std::cout << "Counts:" << std::endl;
+    //     for(int i = 0; i < countersize; i++)
+    //     {
+    //         std::cout << keyvalues[i] << ":\t" << globalcounter[i] << std::endl;
+    //     }
+    //     std::cout << std::endl;
+    // }
+    
 
 } // isort
 
