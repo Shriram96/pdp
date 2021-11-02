@@ -36,37 +36,37 @@ void isort(std::vector<short int>& Xi, MPI_Comm comm) {
     MPI_Barrier(comm);
 
     
-        for(int i = 0; i < countersize; i++)
+    for(int i = 0; i < countersize; i++)
+    {
+        keyvalues[i] = i-size+1;
+    }
+
+    for(int i = 0; i < countersize-1; i++)
+    {
+        if(globalcounter[i] != 0)
         {
-            keyvalues[i] = i-size+1;
+            continue;
         }
-
-        for(int i = 0; i < countersize-1; i++)
+        else
         {
-            if(globalcounter[i] != 0)
+            if(globalcounter[i + 1] == 0)
             {
-                continue;
-            }
-            else
-            {
-                if(globalcounter[i + 1] == 0)
+                for(int j = i; j < countersize; j++)
                 {
-                    for(int j = i; j < countersize; j++)
+                    if(globalcounter[j] != 0)
                     {
-                        if(globalcounter[j] != 0)
-                        {
-                            globalcounter[i + 1] = globalcounter[j];
-                            globalcounter[j] = 0;
+                        globalcounter[i + 1] = globalcounter[j];
+                        globalcounter[j] = 0;
 
-                            short int temp = keyvalues[i + 1];
-                            keyvalues[i + 1] = keyvalues[j];
-                            keyvalues[j] = temp;
-                            break;
-                        }
+                        short int temp = keyvalues[i + 1];
+                        keyvalues[i + 1] = keyvalues[j];
+                        keyvalues[j] = temp;
+                        break;
                     }
                 }
             }
         }
+    }
 
 
     unsigned long long int totalsize = globalcounter[rank] + globalcounter[rank + 1];
