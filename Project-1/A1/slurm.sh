@@ -12,7 +12,7 @@
 
 ####### CUSTOMIZE THIS SECTION FOR YOUR JOB
 #SBATCH --job-name="shriramr"
-#SBATCH --nodes=4
+#SBATCH --nodes=10
 #SBATCH --ntasks-per-node=10
 #SBATCH --time=00:15:00
 
@@ -20,12 +20,12 @@ module load gcc
 module load intel-mpi
 # make clean all
 
-keys=( 2 3 4 5 6 7 8 9 10 )
+keys=( 3 4 5 6 7 8 9 10 )
 base=10
 tests=5
 for i in "${keys[@]}"
 do
-    echo "Nodes = 40"
+    echo "Nodes = 100"
     echo "Keys = $i"
     echo "START:############################################################"
     for (( k = 0; k < "$tests"; k++ ))
