@@ -51,7 +51,6 @@ NUM_NODES=${#NODES[@]}
 LAST=$((NUM_NODES - 1))
 
 # FIRST NODE IS MASTER
-echo -e "\n${NODES[0]}"
 ssh ${NODES[0]} "export SPARK_LOG_DIR=$SLURMTMPDIR; export SPARK_LOCAL_DIRS=$SLURMTMPDIR; export SPARK_WORKER_DIR=$SLURMTMPDIR; cd $SPARK_PATH; ./sbin/start-master.sh"
 MASTER="spark://${NODES[0]}:7077"
 
@@ -66,7 +65,6 @@ TEMP_OUT_DIR=$SLURM_SUBMIT_DIR/spark-$SLURM_JOB_ID
 # ALL NODES ARE WORKERS
 mkdir -p $TEMP_OUT_DIR
 for i in `seq $exclude_master $LAST`; do
-  echo -e "\n$i) ${NODES[$i]}"
   ssh ${NODES[$i]} "export SPARK_LOG_DIR=$SLURMTMPDIR; export SPARK_LOCAL_DIRS=$SLURMTMPDIR; export SPARK_WORKER_DIR=$SLURMTMPDIR; cd $SPARK_PATH; nohup ./bin/spark-class org.apache.spark.deploy.worker.Worker $MASTER &> $TEMP_OUT_DIR/nohup-${NODES[$i]}.$i.out" &
 done
 
@@ -78,10 +76,8 @@ export SPARK_WORKER_DIR=$SLURMTMPDIR
 $SPARK_PATH/bin/spark-submit --master $MASTER $SPARK_ARGS $PROG $ARGS
 
 # CLEAN SPARK JOB
-echo -e "\n${NODES[0]}"
 ssh ${NODES[0]} "cd $SPARK_PATH; ./sbin/stop-master.sh"
 
 for i in `seq 0 $LAST`; do
-  echo -e "\n$i) ${NODES[$i]}"
   ssh ${NODES[$i]} "killall java"
 done
