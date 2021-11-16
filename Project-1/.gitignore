@@ -2,3 +2,6 @@
 *.stderr
 *.stdout
 a*
+**/test-slurm*
+.ssh
+spark-*
