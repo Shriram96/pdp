@@ -5,20 +5,43 @@ import sys
 def edge(line):
     l = line.split(" ")
     e = [int(x) for x in l]
-    return [e[0], e[1]]
+    return [(e[1], [e[0]])]
+
+def sample(record):
+    rand = []
+    for i in record[1]:
+        rand.append((i, record[0]))
+    return rand
+
+def processRecord(record):
+    print("Dale", record)
 
 if __name__ == "__main__":
     print("Dale")
+    # exit()
     infile = sys.argv[1]
     # infile = "/user/shriramr/pdp/Project-1/A2/sample_input.txt"
     outdir = sys.argv[2]
-    # outdir = "/user/shriramr/pdp/Project-1/A2/sample_output.txt"
+    # outdir = "/user/shriramr/pdp/Project-1/A2/test-results/sample_output.txt"
     
     conf = SparkConf().setAppName("PointerJumper")
     sc = SparkContext(conf = conf)
     lines = sc.textFile(infile)
     edge_map = lines.flatMap(edge)
-    E = edge_map.reduceByKey(lambda a, b: [a] + [b])
+    datacollector = edge_map.collect()
+    for row in datacollector:
+        print("Dale", row[0], ":", row[1])
+    edge_map.foreach(processRecord)
+    E = edge_map.reduceByKey(lambda a, b: a + b)
+    datacollector = E.collect()
+    for row in datacollector:
+        print("Dale", row[0], ":", row[1])
+    E.foreach(processRecord)
     E.saveAsTextFile(outdir)
-    print(sys.argv[1], sys.argv[2])
+
+    E1 = E.flatMap(sample)
+    datacollector = E1.collect()
+    for row in datacollector:
+        print("Dale", row[0], ":", row[1])
+    print("Dale", infile, outdir)
     sc.stop()
