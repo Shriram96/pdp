@@ -6,7 +6,7 @@ import time
 def edge(line):
     l = line.split(" ")
     e = [int(x) for x in l]
-    return [(e[1], e[0])]
+    return [(e[1], e[0]), (e[0], str(e[1]))]
 
 def edge_reverse(line):
     l = line.split(" ")
@@ -28,6 +28,35 @@ def sample(record):
         rand.append((i, record[0]))
     return rand
 
+def record_printer(map, info):
+    datacollector = map.collect()
+    print("##################################################")
+    for row in datacollector:
+        print(info, "Dale", row[0], ":", row[1])
+    print("##################################################")
+
+def rootnodes(record):
+    if record[0] == record[1]:
+        return record[0], record[1]
+
+def unveil(record):
+    answer = 0
+    return_records = []
+    for i in record[1]:
+        if type(i) == str:
+            answer = i
+    for i in record[1]:
+        if type(i) != str:
+            return_records.append((i, answer))
+            return_records.append((int(answer), i))
+    return return_records
+
+def finalmap(record):
+    return_records = []
+    for i in record[1]:
+        if type(i) != str:
+            return_records.append((i, record[0]))
+    return return_records
 
 if __name__ == "__main__":
     infile = sys.argv[1]
@@ -36,57 +65,32 @@ if __name__ == "__main__":
     start = time.time()
     conf = SparkConf().setAppName("PointerJumper")
     sc = SparkContext(conf = conf)
+    # sc.setLogLevel("ERROR")
 
     lines = sc.textFile(infile)
 
-    edge_map = lines.flatMap(edge)
-    edge_map.persist()
-    # datacollector = edge_map.collect()
-    # for row in datacollector:
-    #     print("Edges Dale", row[0], ":", row[1])
+    M = lines.flatMap(edge)
+    R = None
 
-    count = edge_map.flatMap(edge_count).reduceByKey(lambda a, b: a + b).count()
-    # print("Initial Count Dale: ", count)
-
-    E1 = edge_map.map(reverser)
-    E1.persist()
-    # datacollector = E1.collect()
-    # for row in datacollector:
-    #     print("Reverse Edges Dale", row[0], ":", row[1])
-
+    count = 0
     looper = 0
+
     while(True):
         looper += 1
-
-        E1 = edge_map.join(E1).map(joinmap)
-        E1.persist()
-        edge_map = E1.map(reverser)
-        edge_map.persist()
-        # datacollector = E1.collect()
-        # for row in datacollector:
-        #     print("Join step Dale", row[0], ":", row[1])
-        # datacollector = edge_map.collect()
-        # for row in datacollector:
-        #     print("Edge list step Dale", row[0], ":", row[1])
-        # distinct_items = E1.countByValue().items()
-        # print("Each Count Dale", distinct_items, " ", len(distinct_items))
-        distinct_root = E1.flatMap(edge_count).reduceByKey(lambda a, b: a + b)
-        # datacollector = distinct_root.collect()
-        # for row in datacollector:
-        #     print("Join 1 Dale", row[0], ":", row[1])
-        distinct_root_count = distinct_root.count()
-        # print("Each distinct Count Dale: ", distinct_root_count)
-        
-        if count == distinct_root_count:
-            print("Dale Connected Components Count: ", distinct_root_count)
-            print("Dale Looper total runs: ", looper)
+        R = M.groupByKey().mapValues(list).filter(lambda a: len(a[1]) > 1)
+        # record_printer(R, "Reduce"+str(looper))
+        step_count = R.count()
+        # print("Step: ", looper, "RDD count: ", step_count)
+        if count == step_count:
             break
         else:
-            count = distinct_root_count
-        
+            count = step_count
+        M = R.flatMap(unveil).filter(lambda a: a is not None)
+        # record_printer(M2, "Map"+str(looper))
+    # record_printer(R.flatMap(finalmap).filter(lambda a: a is not None), "Last Reduced")
+    print("Looper count: ", looper)
 
-    E1.saveAsTextFile(outdir)
-    # print("Dale", infile, outdir)
+    R.flatMap(finalmap).filter(lambda a: a is not None).saveAsTextFile(outdir)
     sc.stop()
     end = time.time()
     print("Dale", end - start)
