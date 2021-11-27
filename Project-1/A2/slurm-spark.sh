@@ -12,7 +12,7 @@
 ####### NOTE: --ntasks-per-node SHOULD BE SET TO INCLUDE ALL CORES IN A NODE
 ####### YOU CAN CONTROL CORE-TO-EXECUTOR RATIO VIA SPARK_ARGS
 #SBATCH --job-name="shriramr"
-#SBATCH --nodes=2
+#SBATCH --nodes=10
 #SBATCH --ntasks-per-node=20
 #SBATCH --output=%j.stdout
 #SBATCH --error=%j.stderr
@@ -25,8 +25,8 @@ exclude_master=0
 module load spark/2.4.0-py37
 
 # SET YOUR COMMAND AND ARGUMENTS
-PROG="a2"
-ARGS=""
+PROG="a2.py"
+ARGS="/panasas/scratch/grp-jzola/intropdp/T0.txt /panasas/scratch/grp-cse570f21/shriramr/T_10_20_final"
 
 # SET EXTRA OPTIONS TO spark-submit
 # HERE YOU CAN CONTROL HOW MANY EXECUTORS YOU WANT TO RUN PER NODE, ETC.
@@ -37,7 +37,7 @@ ARGS=""
 # --driver-cores
 # --driver-memory
 # --py-files
-SPARK_ARGS=""
+SPARK_ARGS="--conf spark.default.parallelism=200"
 
 
 
