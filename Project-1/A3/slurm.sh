@@ -1,10 +1,8 @@
 #!/bin/bash
 
 ####### PLANEX SPECIFIC - DO NOT EDIT THIS SECTION
-#SBATCH --clusters=faculty
-#SBATCH --partition=planex
-#SBATCH --qos=planex
-#SBATCH --account=cse570f21
+#SBATCH --clusters=ub-hpc
+#SBATCH --qos=general-compute
 #SBATCH --exclusive
 #SBATCH --mem=64000
 #SBATCH --output=%j.stdout
@@ -17,6 +15,28 @@
 #SBATCH --gres=gpu:1
 #SBATCH --time=02:00:00
 
-# module load cuda/11.3.1
+module load gcc
+module load cuda/11.3.1
 # make clean all
-./a3
+nvcc --version
+nvidia-smi
+volumes=( 1 2 3 4 5 6 7 8 9 10 )
+tests=1
+base=10
+h=19.97
+
+for i in "${volumes[@]}"
+do
+   echo "Threads = Get it from device query (CUDA)"
+   echo "Volume = $i"
+   echo "START:############################################################"
+   for (( k = 0; k < "$tests"; k++ ))
+   do
+      ./a3 $[$base**$i] "$h"
+   done
+   echo "END:############################################################"
+
+   echo "PROFILE START:############################################################"
+   sudo /usr/local/cuda-11/bin/nvprof ./a3 $[$base**$i] "$h"
+   echo "PROFILE END:############################################################"
+done
