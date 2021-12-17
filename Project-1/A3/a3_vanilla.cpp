@@ -2,8 +2,9 @@
 #include <iostream>
 #include <random>
 #include <vector>
+#include <functional>
 
-#include "a3.hpp"
+#include "a3_vanilla.hpp"
 
 
 int main(int argc, char* argv[]) {
@@ -12,7 +13,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    int n = std::atoi(argv[1]);
+    unsigned long long int n = std::atoi(argv[1]);
     float h = std::atof(argv[2]);
 
     if (n < 32) {
