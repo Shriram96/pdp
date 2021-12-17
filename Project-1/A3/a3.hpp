@@ -7,50 +7,55 @@
 #define A3_HPP
 #include <math.h>
 
-using namespace std;
 
-__global__ void evaluate(float *x, float *y, unsigned long long int n, float h,float A){
+__global__ void calculate(float *x, float *y, unsigned long long int n, float h,float static_value){
     extern __shared__ float buf[];
     float* Xs = buf;
+	float K = 0.0;
 
-    int m = blockDim.x;
-    int idx = threadIdx.x;
-    int bdx = blockIdx.x;
-    int i = bdx*m + idx;
-    float k = 0.0;
+    int block_dim = blockDim.x; // Only takes 32
+    int t_idx = threadIdx.x; // Takes between 0..32
+    int b_idx = blockIdx.x; // Takes between 0..n/m
+
+    int i = b_idx * block_dim + t_idx;
 
     float xi = x[i];
-    __syncthreads();
-    for (int l = 0; l < gridDim.x; l++) {
-        Xs[idx] = x[l*m + idx];
+    for (int j = 0; j < gridDim.x; j++) // Looping through each block in the grid. // 0..n/m
+	{
+        Xs[t_idx] = x[j * block_dim + t_idx];
         __syncthreads();
-        for (int j = 0; j < m && (l*m + j<n); j++) {
-            float a = (xi - Xs[j])/h;
-            k += expf(-powf(a,2)/2);
+
+        for (int l = 0; (l < block_dim) && ((j * block_dim + l) < n); l++) // Looping through each thread in the block. // 0..32
+		{
+            float a = (xi - Xs[l]) / h;
+            K += expf(-powf(a, 2) / 2);
         }
-        // __syncthreads();
+        __syncthreads();
     }
-    y[i] = A*k;
+    y[i] = static_value*K;
 }
 
 void gaussian_kde(unsigned long long int n, float h, const std::vector<float>& x, std::vector<float>& y) {
-   int m = 32;
 
-   float *deviceX, *deviceY;
+	float static_value = 1/(n * h * sqrtf(2 * M_PI));
 
-   unsigned long long int size = n*sizeof(float);
-   float A = 1/(n*h*sqrtf(2*M_PI));
+   	int block_threads = 32;
+	int buf_size = block_threads * sizeof(float);
+	unsigned long long int block_nums = n / block_threads;
+	if(n % block_threads != 0) 
+		block_nums += 1;
 
-   cudaMalloc(&deviceX, size);
-   cudaMalloc(&deviceY, size);
+    float *d_x, *d_y;
+	unsigned long long int size = n * sizeof(float);
+    cudaMalloc(&d_x, size);
+    cudaMalloc(&d_y, size);
 
-   cudaMemcpy(deviceX, x.data(), size, cudaMemcpyHostToDevice);
-   evaluate<<<(unsigned long long int)ceil((float)n/(float)m),m,m*sizeof(float)>>>(deviceX, deviceY,n,h,A);
-   cudaMemcpy(y.data(), deviceY, size, cudaMemcpyDeviceToHost);
+	cudaMemcpy(d_x, x.data(), size, cudaMemcpyHostToDevice);
+	calculate<<<block_nums, block_threads, buf_size>>>(d_x, d_y, n, h, static_value);
+	cudaMemcpy(y.data(), d_y, size, cudaMemcpyDeviceToHost);
 
-   // cout<<A<<endl;
-   cudaFree(deviceX);
-   cudaFree(deviceY);
+	cudaFree(d_x);
+	cudaFree(d_y);
 } // gaussian_kde
 
 #endif // A3_HPP
